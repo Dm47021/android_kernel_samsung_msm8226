@@ -35,10 +35,6 @@ static void msm_hsusb_vbus_power(struct msm_otg *motg, bool on);
 #if defined(CONFIG_MUIC_SM5502_SUPPORT_LANHUB_TA)
 extern bool lanhub_ta_case;
 #endif
-#ifdef CONFIG_EXTCON_MAX77804K
-extern int muic_otg_control(int enable);
-#endif
-#ifndef CONFIG_EXTCON_MAX77804K
 int sec_battery_otg_control(int enable)
 {
 	union power_supply_propval value;
@@ -76,22 +72,17 @@ if (enable) {
 	}
 	return ret;
 }
-#endif
 
-struct booster_data sec_booster_batt = {
+struct booster_data sec_booster = {
 	.name = "sec_battery",
-#ifdef CONFIG_EXTCON_MAX77804K
-	.boost = muic_otg_control,
-#else
 	.boost = sec_battery_otg_control,
-#endif
 };
 
-int msm_otg_sec_power(bool on)
+static int msm_otg_sec_power(bool on)
 {
 	int ret = 0;
 	pr_info("msm_otg_sec_power: %d\n", on);
-#if defined(CONFIG_MFD_MAX77693) || defined(CONFIG_EXTCON_MAX77804K)
+#ifdef CONFIG_MFD_MAX77693
 	muic_otg_control(on);
 #else
 	ret = sec_battery_otg_control(on);
@@ -158,7 +149,7 @@ static void msm_otg_host_notify(struct msm_otg *motg, int on)
 
 static int msm_host_notify_init(struct device *dev, struct msm_otg *motg)
 {
-	sec_otg_register_booster(&sec_booster_batt);
+	sec_otg_register_booster(&sec_booster);
 	INIT_DELAYED_WORK(&motg->late_power_work, msm_otg_late_power_work);
 	return 0;
 }
@@ -252,6 +243,7 @@ void msm_otg_set_smartdock_state(bool online)
 		queue_work(system_nrt_wq, &motg->sm_work);
 }
 EXPORT_SYMBOL_GPL(msm_otg_set_smartdock_state);
+
 
 int sec_handle_event(int enable)
 {

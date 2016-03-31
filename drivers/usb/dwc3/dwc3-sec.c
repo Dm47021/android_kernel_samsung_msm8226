@@ -414,8 +414,6 @@ static struct sec_cable support_cable_list[] = {
 #if defined(CONFIG_SEC_K_PROJECT)
 extern u8 usb30en;
 #endif
-
-extern void set_ncm_ready(bool ready);
 static void sec_usb_work(int usb_mode)
 {
 	struct power_supply *psy;
@@ -430,8 +428,6 @@ static void sec_usb_work(int usb_mode)
 /* USB3.0 Popup option */
 		usb30en = 0;
 #endif
-	if(!usb_mode)
-		set_ncm_ready(false);
 
 	psy = power_supply_get_by_name("dwc-usb");
 	pr_info("usb: dwc3 power supply set(%d)", usb_mode);
