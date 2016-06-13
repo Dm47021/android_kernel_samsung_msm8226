@@ -11,19 +11,6 @@
  * GNU General Public License for more details.
  */
 
-&spmi_bus {
-	qcom,pm8226@1 {
-		qcom,leds@d300 {
-			compatible = "qcom,leds-qpnp";
-			status = "okay";
-			reg = <0xd300 0x100>;
-			label = "flash";
-			flash-boost-supply = <&pm8226_chg_boost>;
-			flash-wa-supply = <&pm8226_chg_chgr>;
-		};
-	};
-};
-
 &soc {
 	i2c@20 {
 		cell-index = <20>;
@@ -47,10 +34,8 @@
 		cell-index = <0>;
 		compatible = "qcom,camera-led-flash";
 		qcom,flash-type = <1>;
-		qcom,flash-source = <&pm8226_flash0>;
+		qcom,flash-source = <&pm8226_flash0 &pm8226_flash1>;
 		qcom,torch-source = <&pm8226_torch>;
-		#address-cells = <1>;
-		#size-cells = <0>;
 	};
 
 	spi@f9923000 {
@@ -301,9 +286,7 @@
 		qcom,cam-vreg-name = "cam_vdig", "cam_vio",
 				     "cam_vaf";
 		qcom,cam-vreg-type = <0 0 0>;
-		qcom,cam-vreg-min-voltage = <1225000 0 2800000>;
-		qcom,cam-vreg-max-voltage = <1225000 0 2800000>;
-		qcom,cam-vreg-op-mode = <1225000 0 2800000>;
+		qcom,cam-vreg-op-mode = <1225000 1800000 2800000>;
 		qcom,gpio-no-mux = <0>;
 		gpios = <&msmgpio 26 0>,
 				<&msmgpio 37 0>,
@@ -324,22 +307,20 @@
 		qcom,csiphy-sd-index = <1>;
 		qcom,csid-sd-index = <1>;
 		cam_vio-supply = <&pm8226_l27>;  /* rev 0.3 device uses VDD_LDO_IO_1.8V , VREG_L27_2P05 is not used */
-		qcom,cam-vreg-name = "cam_vdig", "cam_vio";
-		qcom,cam-vreg-type = <1 0>;
-		qcom,cam-vreg-min-voltage = <0 1800000>;
-		qcom,cam-vreg-max-voltage = <0 1800000>;
-		qcom,cam-vreg-op-mode = <0 1800000>;
+		qcom,cam-vreg-name = "cam_vdig", "cam_vana", "cam_vio";
+		qcom,cam-vreg-type = <1 1 0>;
+		qcom,cam-vreg-op-mode = <0 0 1800000>;
 		qcom,gpio-no-mux = <0>;
 		gpios = <&msmgpio 26 0>,
 				<&msmgpio 28 0>,
 				<&msmgpio 112 0>;
-		qcom,gpio-reset = <1>;
-		qcom,gpio-ext-vana-power = <2>;
 		qcom,gpio-req-tbl-num = <0 1 2>;
 		qcom,gpio-req-tbl-flags = <1 0 0>;
 		qcom,gpio-req-tbl-label = "CAMIF_MCLK",
 					  "CAM_RESET1",
 					  "CAM_VANA_GPIO";
+		qcom,gpio-reset = <1>;
+		qcom,gpio-ext-vana-power = <2>;
 		qcom,cci-master = <0>;
 		status = "ok";
 	};
